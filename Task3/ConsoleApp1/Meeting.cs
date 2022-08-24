@@ -29,5 +29,10 @@ namespace ConsoleApp1
             Notify = time;
             return true;
         }
+
+        public override string ToString()
+        {
+            return $"meet {Name} ({Start.ToString()}-{End.ToString()}) {((Notify==null)?"":Notify.ToString())}";
+        }
     }
 }
