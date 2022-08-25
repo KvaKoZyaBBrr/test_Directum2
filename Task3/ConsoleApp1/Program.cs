@@ -6,10 +6,9 @@ namespace ConsoleApp1
 {
     class Program
     {
-        static List<Meeting> meetingList = new List<Meeting>();
-
         static void Main(string[] args)
         {
+            Sheduler.GetInstance().startMonitor();
             while (true)
             {
                 Console.Clear();
@@ -27,9 +26,9 @@ namespace ConsoleApp1
                     switch (command) {
                         case (1): { AddNewMeeting(); Console.ReadLine(); break; }
                         case (2): { ChangeMeeting(); break; }
-                        case (3): { ViewMeeting(); break; }
+                        case (3): { ViewMeeting(); Console.ReadLine(); break; }
                         case (4): { ExportMeeting(); break; }
-                        case (0):return;
+                        case (0): { Sheduler.GetInstance().isStart = false; return; }
                     }
                 }
             }
@@ -48,7 +47,7 @@ namespace ConsoleApp1
             if (!getValue<DateTime>("end time of meeting", "fail to write end time", out endTime))
                 return false;
 
-            if (endTime > startTime)
+            if (endTime < startTime)
             {
                 Console.WriteLine("fail to write time range");
                 return false;
@@ -67,7 +66,7 @@ namespace ConsoleApp1
                 meeting.SetNotify(notifyTime);
             }
             Console.WriteLine($"New {meeting.ToString()} was created");
-            meetingList.Add(meeting);
+            Sheduler.GetInstance().AddNewMeet(meeting);
             return true;
 
         }
@@ -79,7 +78,6 @@ namespace ConsoleApp1
             var converter = TypeDescriptor.GetConverter(typeof(T));
             if (converter != null)
             {
-                // Cast ConvertFromString(string text) : object to (T)
                 try
                 {
                     data = (T)converter.ConvertFromString(input);
@@ -102,7 +100,9 @@ namespace ConsoleApp1
         }
         static void ViewMeeting()
         {
-
+            DateTime choosenDay;
+            getValue<DateTime>("day for view", "err date", out choosenDay);
+            Sheduler.GetInstance().viewShedule(choosenDay.Date);
         }
         static void ExportMeeting()
         {
