@@ -56,20 +56,37 @@ namespace ConsoleApp1
             }
         }
 
-        public bool viewShedule(DateTime date) {
-            Console.WriteLine(viewStringCreator(date));
+        public bool ViewShedule(DateTime date) {
+            Console.WriteLine(ViewStringCreator(date));
             return true;
         }
 
 
-        string viewStringCreator(DateTime date) {
+        public string ViewStringCreator(DateTime date) {
             List<Meeting> periodMeeting = meetings.Where(x => x.Start.Date == date).ToList();
             string sout = $"Meeting Count = {periodMeeting.Count}";
             for (int i = 0; i < periodMeeting.Count; i++)
             {
-                sout += $"\n{i + 1}. {periodMeeting[i].ToString()}";
+                sout += $"\n{i}. {periodMeeting[i].ToString()}";
             }
             return sout;
+        }
+
+        public bool PrintAllMeetings() {
+            for (int i = 0; i < meetings.Count; i++) {
+                Console.WriteLine($"{i}. {meetings[i].ToString()}");
+            }
+            return true;
+        }
+
+        public bool DeleteMeeting(int index) {
+            meetings.RemoveAt(index);
+            return true;
+        }
+
+        public bool ChangeMeeting(int index, Meeting newMeeting) {
+            meetings[index] = newMeeting;
+            return true;
         }
     }
 }

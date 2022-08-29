@@ -6,6 +6,7 @@ namespace ConsoleApp1
 {
     class Meeting
     {
+        public Guid Id { get; private set; }
         string Name;
         public DateTime Start { get; private set; }
         DateTime End;
@@ -18,6 +19,7 @@ namespace ConsoleApp1
             Start = start;
             End = end;
 
+            Id = Guid.NewGuid();
 
             if (Start > DateTime.Now)
                 status = meetStatus.WAIT;
@@ -28,12 +30,6 @@ namespace ConsoleApp1
 
         }
 
-        public Meeting(string name, DateTime start, DateTime end, DateTime notify) {
-            Name = name;
-            Start = start;
-            End = end;
-            Notify = notify;
-        }
 
         public bool SetNotify(DateTime time) {
             Notify = time;
