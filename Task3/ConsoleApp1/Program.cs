@@ -9,7 +9,9 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            //пуск монитора
             Sheduler.GetInstance().startMonitor();
+            //вывод меню
             while (true)
             {
                 Console.Clear();
@@ -27,16 +29,20 @@ namespace ConsoleApp1
                 if (parserResult) {
                     switch (command) {
                         case (1): { AddNewMeeting(); Console.ReadLine(); break; }
-                        case (2): { DeleteMeeting(); break; }
-                        case (3): { ChangeMeeting(); break; }
+                        case (2): { DeleteMeeting(); Console.ReadLine(); break; }
+                        case (3): { ChangeMeeting(); Console.ReadLine(); break; }
                         case (4): { ViewMeeting(); Console.ReadLine(); break; }
-                        case (5): { ExportMeeting(); break; }
-                        case (0): { Sheduler.GetInstance().isStart = false; return; }
+                        case (5): { ExportMeeting(); Console.ReadLine(); break; }
+                        case (0): { Sheduler.GetInstance().StopMonitor(); return; }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// создание новой встречи
+        /// </summary>
+        /// <returns></returns>
         static bool AddNewMeeting() {
             Meeting meeting;
             if (MeetingCreator(out meeting))
@@ -49,7 +55,11 @@ namespace ConsoleApp1
 
         }
 
-
+        /// <summary>
+        /// создатель встреч. вынесен отдельно для испаользоания при изменении
+        /// </summary>
+        /// <param name="newMeeting">выходнйо параметр встречи</param>
+        /// <returns></returns>
         static private bool MeetingCreator(out Meeting newMeeting) {
             newMeeting = null;
             Console.WriteLine("Enter name of meeting");
@@ -89,11 +99,19 @@ namespace ConsoleApp1
             return true;
         }
 
-
+        /// <summary>
+        /// получание данных из ввода
+        /// </summary>
+        /// <typeparam name="T">тип данных в который надо конвертнуть</typeparam>
+        /// <param name="nameOfData">название параметра</param>
+        /// <param name="strOfErr">строка в случае ошибки</param>
+        /// <param name="data">выходной параметр данных</param>
+        /// <returns></returns>
         static bool getValue<T>(string nameOfData, string strOfErr, out T data) 
         {
             Console.WriteLine($"Enter {nameOfData}");
             string input = Console.ReadLine();
+            //просто использование T.TryParse не удалось, как планировал, поэтому так
             var converter = TypeDescriptor.GetConverter(typeof(T));
             if (converter != null)
             {
@@ -112,17 +130,25 @@ namespace ConsoleApp1
             data = default(T);
             return false;
         }
-        static void DeleteMeeting()
+
+        /// <summary>
+        /// удаление встречи по индексу
+        /// </summary>
+        static bool DeleteMeeting()
         {
             Sheduler.GetInstance().PrintAllMeetings();
             string indexStr = Console.ReadLine();
             int index;
             if (Int32.TryParse(indexStr, out index)) {
-                Sheduler.GetInstance().DeleteMeeting(index);
+                if(Sheduler.GetInstance().DeleteMeeting(index))
+                    Console.WriteLine($"Meeting #{index} was deleted");
             }
-            
+            return true;
         }
         
+        /// <summary>
+        /// изменение встречи по индексу
+        /// </summary>
         static void ChangeMeeting()
         {
             Sheduler.GetInstance().PrintAllMeetings();
@@ -132,11 +158,15 @@ namespace ConsoleApp1
             {
                 Meeting meeting;
                 if (MeetingCreator(out meeting)) {
-                    Sheduler.GetInstance().ChangeMeeting(index, meeting);
+                    if(Sheduler.GetInstance().ChangeMeeting(index, meeting))
+                        Console.WriteLine($"Meeting #{index} was changed");
                 }
             }
         }
 
+        /// <summary>
+        /// просмотр встречи за день
+        /// </summary>
         static void ViewMeeting()
         {
             DateTime choosenDay;
@@ -145,6 +175,10 @@ namespace ConsoleApp1
                 Sheduler.GetInstance().ViewShedule(choosenDay.Date);
             }
         }
+
+        /// <summary>
+        /// экспорт встреч за день
+        /// </summary>
         static void ExportMeeting()
         {
             DateTime choosenDay; 
@@ -155,6 +189,7 @@ namespace ConsoleApp1
                 using (StreamWriter sw = new StreamWriter(path))
                 {
                     sw.Write(exportString);
+                    Console.WriteLine($"Export success");
                 }
             }
             
